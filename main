@@ -1,0 +1,167 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
+
+class Vector {
+protected:
+	int* vec = nullptr;
+	int len;
+public:
+	Vector(int l = 0) : len(l) {
+		if (len > 0) vec = new int[len];
+	}
+
+	Vector(const Vector& source) : len(source.len) {
+		vec = new int[len];
+		for (int i = 0; i < len; i++) vec[i] = source.vec[i];
+	}
+
+	int& operator[](int index) {
+		return vec[index];
+	}
+
+	int operator[](int index) const {
+		return vec[index];
+	}
+
+	~Vector() { delete[] vec; }
+
+	int length() { return len; }
+
+	void insert(int value, int index) {
+		if (index < 0 || index > len) { std::cout << "Input of the index is wrong :(" << std::endl; exit(1); }
+		int* temp = new int[len + 1];
+		if (!temp) { std::cerr << "Error creating a new array :(" << std::endl; exit(1); }
+		
+		for (int i = 0; i < index; i++) temp[i] = vec[i];
+		temp[index] = value; 
+		for (int i = index; i < len; i++) temp[i + 1] = vec[i];
+
+		delete[] vec;
+		vec = temp;
+		len++;
+	}
+
+	void erase(int index) {
+		if (index < 0 || index > len) { std::cout << "Input of the index is wrong :(" << std::endl; exit(1); }
+		int* temp = new int[len - 1];
+		if (!temp) { std::cerr << "Error creating a new array :(" << std::endl; exit(1); }
+
+		for (int i = 0; i < index; i++) temp[i] = vec[i];
+		for (int i = index; i < len; i++) temp[i] = vec[i + 1];
+
+		delete[] vec;
+		vec = temp;
+		len--;
+	}
+
+	void sortIncreasing() {
+		for (int i = 0; i < len; i++) {
+			for (int j = 0; j < len - 1 - i; j++) {
+				if (vec[j] > vec[j + 1]) {
+					int temp = vec[j];
+					vec[j] = vec[j + 1];
+					vec[j + 1] = temp;
+				}
+			}
+		}
+	}
+
+	void sortDecreasing() {
+		for (int i = 0; i < len; i++) {
+			for (int j = len - 1; j > 0 + i; j--) {
+				if (vec[j - 1] < vec[j]) {
+					int temp = vec[j - 1];
+					vec[j - 1] = vec[j];
+					vec[j] = temp;
+				}
+			}
+		}
+	}
+};
+
+void Print(Vector& vect, int length) {
+	std::cout << "------------------------------------------------" << std::endl;
+	std::cout << "Array:" << std::endl;
+	for (int i = 0; i < length; i++) {
+		std::cout << vect[i] << "  ";
+	}
+	std::cout << std::endl << "------------------------------------------------" << std::endl;
+}
+
+void console() {
+	std::vector<int> arr;
+	std::string line;
+	std::cout << "Input your original integer array:" << std::endl;
+	
+	while (true) {
+		std::getline(std::cin, line);
+		if (line.empty()) break;
+
+		std::istringstream iss(line);
+		int num;
+		if (iss >> num) {
+			arr.push_back(num);
+		}
+		else { std::cout << "Input error :(" << std::endl; exit(1); }
+
+	}
+
+	std::cout << "------------------------------------------------" << std::endl;
+	std::cout << "Your original array:" << std::endl;
+	for (int i = 0; i < arr.size(); i++) {
+		std::cout << arr[i] << "  ";
+	}
+	std::cout << std::endl << "------------------------------------------------" << std::endl;
+
+
+	int length = arr.size();
+	Vector vect(length);
+	for (int i = 0; i < length; i++) vect[i] = arr[i];
+
+	int choice = -1;
+	while (choice != 0) {
+		std::cout << "Choose the action:" << std::endl;
+		std::cout << "1) Insert a value at necessary index" << std::endl;
+		std::cout << "2) Delete a value at necessary index" << std::endl;
+		std::cout << "3) Sort the array in increasing order" << std::endl;
+		std::cout << "4) Sort the array in decreasing order" << std::endl;
+		std::cout << "0) Exit" << std::endl;
+		std::cin >> choice;
+
+		int value, index;
+		switch (choice) {
+		case 1:
+			std::cout << "Input the value and index:" << std::endl;
+			std::cin >> value >> index;
+			vect.insert(value, index);
+			length = vect.length();
+			Print(vect, length);
+			break;
+		case 2:
+			std::cout << "Input the index:" << std::endl;
+			std::cin >> index;
+			vect.erase(index);
+			length = vect.length();
+			Print(vect, length);
+			break;
+		case 3:
+			vect.sortIncreasing();
+			Print(vect, length);
+			break;
+		case 4:
+			vect.sortDecreasing();
+			Print(vect, length);
+			break;
+		case 0: break;
+		default: std::cout << "Wrong command :(" << std::endl;
+		}
+	}
+}
+
+int main() {
+	console();
+
+	return 0;
+}
